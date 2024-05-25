@@ -1,3 +1,12 @@
+
+Modified for uninstalled use.
+
+## Usage
+```bash
+# python /path/to/evaluate_3d_reconstruction.py full_path_to_pred_ply full_path_to_gt_ply
+python /home/chrisliu/Projects/evaluate_3d_reconstruction_lib/evaluate_3d_reconstruction/evaluate_3d_reconstruction.py /media/chrisliu/T9/ProjectData/RIMv2/Replica/RIM/240522_b4a4ce8/2024-05-22-11-17-05_room2/mesh.ply /home/chrisliu/Projects/rimv2_ws/src/RIM2/data/Replica/cull_replica_mesh/room2.ply
+```
+
 # Evaluate F-score
 
 This is a modified version of the F-score evaluation of 3D meshes provided by [**Thanks and Temples**](https://github.com/isl-org/TanksAndTemples/tree/master/python_toolbox/evaluation). 

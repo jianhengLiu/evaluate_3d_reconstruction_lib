@@ -41,16 +41,17 @@ from sys import argv
 import pathlib
 import trimesh
 
-from evaluate_3d_reconstruction.config import ground_truth_data_base
-from evaluate_3d_reconstruction.evaluation import EvaluateHisto
-from evaluate_3d_reconstruction.util import make_dir
-from evaluate_3d_reconstruction.plot import plot_graph
+from config import ground_truth_data_base
+from evaluation import EvaluateHisto
+from util import make_dir
+from plot import plot_graph
+
 
 def get_align_transformation(rec_meshfile, gt_meshfile):
     """
     Get the transformation matrix to align the reconstructed mesh to the ground truth mesh.
     """
-    o3d_rec_mesh = trimesh.load(rec_meshfile) 
+    o3d_rec_mesh = trimesh.load(rec_meshfile)
     o3d_gt_mesh = trimesh.load(gt_meshfile)
     o3d_rec_pc = o3d.geometry.PointCloud(
         points=o3d.utility.Vector3dVector(o3d_rec_mesh.vertices)
@@ -73,8 +74,7 @@ def get_align_transformation(rec_meshfile, gt_meshfile):
 
 def run_evaluation(
     pred_ply,
-    path_to_pred_ply,
-    scene,
+    scene = "scene",
     distance_thresh=0.01,
     gt_translate_to_zero=False,
     pred_translate_to_zero=False,
@@ -104,11 +104,12 @@ def run_evaluation(
     else:
         gt_ply_path = full_path_to_gt_ply
 
+    scene = pathlib.Path(gt_ply_path).stem
     # full path to predicted mesh
-    pred_ply_path = path_to_pred_ply + "/" + pred_ply
+    pred_ply_path = pathlib.Path(pred_ply)
 
     # output directory
-    out_dir = path_to_pred_ply + "/" + "evaluation_results"
+    out_dir = str(pred_ply_path.parent / "evaluation_results")
 
     # create output directory
     make_dir(out_dir)
@@ -125,7 +126,6 @@ def run_evaluation(
 
     # Load reconstruction and corresponding GT
     # Using trimesh to load because sometimes open3d fails loading .ply files
-		
     mesh = trimesh.load(pred_ply_path)
     if icp_align:
         transformation = get_align_transformation(pred_ply_path, gt_ply_path)
@@ -247,24 +247,22 @@ def run_evaluation(
     )
 
     return {
-         "dist_threshold": dTau,
-         "precision": eva[0],
-         "recall": eva[1],
-         "f-score": eva[2],
-         "mean precision": mean1,
-         "mean recall": mean2
-         }
+        "dist_threshold": dTau,
+        "precision": eva[0],
+        "recall": eva[1],
+        "f-score": eva[2],
+        "mean precision": mean1,
+        "mean recall": mean2,
+    }
 
 
 if __name__ == "__main__":
 
     pred_ply = argv[1]  # name of predicted .ply file
-    scene = argv[2]  # scene name
-    full_path_to_gt_ply = argv[3]
+    full_path_to_gt_ply = argv[2]  # scene name
 
     run_evaluation(
         pred_ply=pred_ply,
-        path_to_pred_ply=str(pathlib.Path().absolute()),
-        scene=scene,
-	full_path_to_gt_ply=full_path_to_gt_ply,
+        full_path_to_gt_ply=full_path_to_gt_ply,
+        icp_align=False,
     )
